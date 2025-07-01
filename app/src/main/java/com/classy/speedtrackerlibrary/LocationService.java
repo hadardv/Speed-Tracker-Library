@@ -29,7 +29,8 @@ import com.google.android.gms.location.Priority;
 public class LocationService extends Service {
     private FusedLocationProviderClient locationClient;
     private LocationCallback locationCallback;
-    private final AnalyticsManager analytics = new AnalyticsManager();
+    private final AnalyticsManager analytics = AnalyticsManager.getInstance();
+
 
 
     @Override

@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +23,9 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
     private TextView speedTextView;
+    private final AnalyticsManager analytics = AnalyticsManager.getInstance();
+
+
     private final BroadcastReceiver speedReceiver = new BroadcastReceiver() {
         @SuppressLint("SetTextI18n")
         @Override
@@ -37,9 +41,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            registerReceiver(speedReceiver, new IntentFilter("com.classy.SPEED_UPDATE"), Context.RECEIVER_NOT_EXPORTED);
-        }
+
+
+        // Register the broadcast receiver for all Android versions
+        IntentFilter filter = new IntentFilter("com.classy.SPEED_UPDATE");
+        registerReceiver(speedReceiver, new IntentFilter("com.classy.SPEED_UPDATE"), Context.RECEIVER_NOT_EXPORTED);
+
         speedTextView = findViewById(R.id.speedTextView);
 
         Button startButton = findViewById(R.id.startServiceButton);
@@ -57,7 +64,24 @@ public class MainActivity extends AppCompatActivity {
 
         stopButton.setOnClickListener(v -> {
             stopService(new Intent(this, LocationService.class));
+            // Save the ride summary in SharedPreferences
+            SharedPreferences prefs = getSharedPreferences("rides", MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+
+            String json = analytics.getSummaryAsJson();  // Make sure you have this method in AnalyticsManager
+            String key = "ride_" + System.currentTimeMillis();
+            editor.putString(key, json);
+            editor.apply();
+            Intent i = new Intent(this, ResultsActivity.class);
+            i.putExtra("max", analytics.getMaxSpeed());
+            i.putExtra("min", analytics.getMinSpeed());
+            i.putExtra("avg", analytics.getAverageSpeed());
+            i.putExtra("urban", analytics.getUrbanCount());
+            i.putExtra("suburban", analytics.getSuburbanCount());
+            i.putExtra("highway", analytics.getHighwayCount());
+            startActivity(i);
         });
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

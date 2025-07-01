@@ -2,12 +2,20 @@ package com.classy.speedtrackerlibrary;
 
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public class AnalyticsManager {
+    private static final AnalyticsManager instance = new AnalyticsManager();
+    public static AnalyticsManager getInstance() {
+        return instance;
+    }
+    private AnalyticsManager() {}
     private final List<Float> speeds = new ArrayList<>();
     private int urbanCount = 0;
     private int suburbanCount = 0;
@@ -67,4 +75,20 @@ public class AnalyticsManager {
     public int getHighwayCount(){
         return highwayCount;
     }
+
+    public String getSummaryAsJson() {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("max", getMaxSpeed());
+            obj.put("min", getMinSpeed());
+            obj.put("avg", getAverageSpeed());
+            obj.put("urban", getUrbanCount() / 60);
+            obj.put("suburban", getSuburbanCount() / 60);
+            obj.put("highway", getHighwayCount() / 60);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return obj.toString();
+    }
+
 }
