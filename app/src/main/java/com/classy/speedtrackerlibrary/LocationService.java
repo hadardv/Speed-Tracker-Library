@@ -29,6 +29,8 @@ import com.google.android.gms.location.Priority;
 public class LocationService extends Service {
     private FusedLocationProviderClient locationClient;
     private LocationCallback locationCallback;
+    private final AnalyticsManager analytics = new AnalyticsManager();
+
 
     @Override
     public void onCreate() {
@@ -36,12 +38,22 @@ public class LocationService extends Service {
         locationClient = LocationServices.getFusedLocationProviderClient(this);
         locationCallback = new LocationCallback() {
             @Override
-            public void onLocationResult(LocationResult result) {
+            public void onLocationResult(@NonNull LocationResult result) {
                 for (Location location : result.getLocations()) {
-                    float speedMps = location.getSpeed();
-                    float speedKmh = speedMps * 3.6f;
+                    // this two lines are for real speed calculation, i'm on testing mode so i randomize the speed.
+//                    float speedMps = location.getSpeed();
+//                    float speedKmh = speedMps * 3.6f;
+                    float speedKmh = new java.util.Random().nextInt(150); // simulate 0–120 km/h
 
                     Log.d("SpeedTracker", "Speed: " + speedKmh + " km/h");
+                    analytics.addSpeed(speedKmh);
+                    analytics.categorizeSpeed(speedKmh);
+                    Log.d("SpeedTracker", "Max: " + analytics.getMaxSpeed() +
+                            ", Min: " + analytics.getMinSpeed() +
+                            ", Avg: " + analytics.getAverageSpeed() +
+                            ", Urban: " + analytics.getUrbanCount() +
+                            ", Suburban: " + analytics.getSuburbanCount() +
+                            ", Highway: " + analytics.getHighwayCount());
 
                     Intent intent = new Intent("com.classy.SPEED_UPDATE");
                     intent.putExtra("speed", speedKmh);
@@ -54,6 +66,7 @@ public class LocationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         startForeground(1,createNotification());
         requestLocationUpdates();
+        Log.d("SpeedTracker", "onStartCommand: Service started");
         return START_STICKY;
 
     }
@@ -94,6 +107,7 @@ public class LocationService extends Service {
     public void onDestroy() {
         super.onDestroy();
         locationClient.removeLocationUpdates(locationCallback);
+        analytics.reset();
     }
 
     @Nullable
