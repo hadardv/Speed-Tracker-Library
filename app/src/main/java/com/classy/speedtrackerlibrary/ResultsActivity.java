@@ -1,6 +1,7 @@
 package com.classy.speedtrackerlibrary;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -13,22 +14,29 @@ public class ResultsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
 
-        TextView resultsText = findViewById(R.id.resultsText);
+        TextView maxSpeedText = findViewById(R.id.maxSpeedText);
+        TextView minSpeedText = findViewById(R.id.minSpeedText);
+        TextView avgSpeedText = findViewById(R.id.avgSpeedText);
+        TextView urbanTimeText = findViewById(R.id.urbanTimeText);
+        TextView suburbanTimeText = findViewById(R.id.suburbanTimeText);
+        TextView highwayTimeText = findViewById(R.id.highwayTimeText);
+
+        Intent intent = getIntent();
 
         float max = getIntent().getFloatExtra("max", 0f);
         float min = getIntent().getFloatExtra("min", 0f);
         float avg = getIntent().getFloatExtra("avg", 0f);
-        long urbanSec = getIntent().getIntExtra("urban", 0);
-        long suburbanSec = getIntent().getIntExtra("suburban", 0);
-        long highwaySec = getIntent().getIntExtra("highway", 0);
+        long urbanMin = getIntent().getIntExtra("urban", 0) / 60;
+        long suburbanMin = getIntent().getIntExtra("suburban", 0) / 60;
+        long highwayMin = getIntent().getIntExtra("highway", 0) / 60;
 
-        resultsText.setText(
-                "Max Speed: " + max + " km/h\n" +
-                        "Min Speed: " + min + " km/h\n" +
-                        "Avg Speed: " + avg + " km/h\n" +
-                        "Urban Time: " + (urbanSec / 60) + " min\n" +
-                        "Suburban Time: " + (suburbanSec / 60) + " min\n" +
-                        "Highway Time: " + (highwaySec / 60) + " min"
-        );
+        maxSpeedText.setText("Max Speed: " + max + " km/h");
+        minSpeedText.setText("Min Speed: " + min + " km/h");
+        avgSpeedText.setText("Avg Speed: " + avg + " km/h");
+
+        urbanTimeText.setText("Urban Time: " +urbanMin+ " min");
+        suburbanTimeText.setText("Suburban Time: " + suburbanMin + " min");
+        highwayTimeText.setText("Highway Time: " + highwayMin + " min");
+
     }
 }

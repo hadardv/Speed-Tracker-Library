@@ -1,33 +1,40 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
+    android:background="#121212"
     android:padding="24dp">
-
-    <Button
-        android:id="@+id/startServiceButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start Speed Tracking" />
-
-    <Button
-        android:id="@+id/stopServiceButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Stop Speed Tracking"
-        android:layout_marginTop="16dp" />
 
     <TextView
         android:id="@+id/speedTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Speed: 0 km/h"
-        android:textSize="32sp"
+        android:text="0 km/h"
+        android:textSize="64sp"
+        android:textColor="#FFFFFF"
         android:textStyle="bold"
-        android:textColor="#4CAF50"
-        android:layout_gravity="center"
-        android:layout_marginTop="50dp"/>
+        android:layout_marginBottom="60dp" />
+
+    <Button
+        android:id="@+id/startServiceButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Tracking"
+        android:textSize="18sp"
+        android:backgroundTint="#4CAF50"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/stopServiceButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Stop Tracking"
+        android:textSize="18sp"
+        android:backgroundTint="#F44336"
+        android:textColor="#FFFFFF" />
+
 </LinearLayout>

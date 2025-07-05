@@ -34,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             float speedKmh = intent.getFloatExtra("speed", 0f);
             Log.d("MainActivity", "Received speed update: " + speedKmh);
-            speedTextView.setText("Speed: " + speedKmh + " km/h");
+            speedTextView.setText((int) speedKmh + " km/h");
+
         }
     };
 
