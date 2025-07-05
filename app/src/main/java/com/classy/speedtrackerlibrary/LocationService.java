@@ -35,6 +35,7 @@ public class LocationService extends Service {
 
     @Override
     public void onCreate() {
+        Log.d("LocationService", "PID: " + android.os.Process.myPid());
         super.onCreate();
         locationClient = LocationServices.getFusedLocationProviderClient(this);
         locationCallback = new LocationCallback() {
@@ -57,7 +58,11 @@ public class LocationService extends Service {
                             ", Highway: " + analytics.getHighwayCount());
 
                     Intent intent = new Intent("com.classy.SPEED_UPDATE");
+                    intent.setPackage(getPackageName());
                     intent.putExtra("speed", speedKmh);
+                    sendBroadcast(intent);
+                    Log.d("SpeedTracker", "Broadcast sent: ");
+
                     sendBroadcast(intent);
                 }
             }

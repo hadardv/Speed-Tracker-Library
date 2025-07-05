@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.Manifest;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -27,27 +28,41 @@ public class MainActivity extends AppCompatActivity {
 
 
     private final BroadcastReceiver speedReceiver = new BroadcastReceiver() {
-        @SuppressLint("SetTextI18n")
+
+        @SuppressLint({"SetTextI18n", "LongLogTag"})
         @Override
         public void onReceive(Context context, Intent intent) {
-            float speed = intent.getFloatExtra("speed", 0f);
-            speedTextView.setText("Speed: " + speed + " km/h");
+            float speedKmh = intent.getFloatExtra("speed", 0f);
+            Log.d("MainActivity", "Received speed update: " + speedKmh);
+            speedTextView.setText("Speed: " + speedKmh + " km/h");
         }
     };
 
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    private final BroadcastReceiver debugReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("DebugReceiver", "Received action: " + intent.getAction());
+        }
+    };
+
+
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-
-        // Register the broadcast receiver for all Android versions
-        IntentFilter filter = new IntentFilter("com.classy.SPEED_UPDATE");
-        registerReceiver(speedReceiver, new IntentFilter("com.classy.SPEED_UPDATE"), Context.RECEIVER_NOT_EXPORTED);
-
         speedTextView = findViewById(R.id.speedTextView);
+
+        IntentFilter filter = new IntentFilter("com.classy.SPEED_UPDATE");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(speedReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(speedReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        }
+
 
         Button startButton = findViewById(R.id.startServiceButton);
         Button stopButton = findViewById(R.id.stopServiceButton);
