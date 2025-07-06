@@ -17,7 +17,7 @@
 
 ---
 
-## 🏗 Installation
+## Installation
 
 1. Clone the repository or copy the code into your Android Studio project.
 2. Ensure the following permissions are declared in `AndroidManifest.xml`:
