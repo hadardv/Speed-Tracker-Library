@@ -70,7 +70,15 @@
   - Max / Min / Avg speed (real-time)
   - JSON export for historical storage
 ---
+## screenshots
+![1000000064](https://github.com/user-attachments/assets/89efb542-d830-441b-a824-c1a4f433c8db)
+![1000000065](https://github.com/user-attachments/assets/c0d2e05b-a9ed-435e-8435-76bb9d7f25ba)
 
+
+https://github.com/user-attachments/assets/65cdcf2b-3384-44eb-85a4-064a4d6e58e3
+
+
+---
 ## Permissions
 
 Make sure to handle runtime permission requests in `MainActivity` for:
