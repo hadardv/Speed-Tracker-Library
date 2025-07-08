@@ -1,19 +1,25 @@
 # SpeedTrackerLibrary
 
-**SpeedTrackerLibrary** is an Android app that tracks real-time driving speed using GPS, categorizes segments by road type (urban, suburban, highway), and provides ride analytics such as max, min, and average speed.
+**SpeedTrackerLibrary** is an Android app that tracks real-time driving speed using GPS and motion sensors. It categorizes segments by road type (urban, suburban, highway) and provides ride analytics including max, min, and average speed, as well as aggressive driving events.
 
 ---
 
-##  Features
+## Features
 
--  Real-time speed tracking with location service  
--  Uses Android's `FusedLocationProviderClient` for accurate updates  
--  Summary screen with:
+- Real-time speed tracking using GPS
+- Accelerometer and gyroscope-based aggressive driving detection
+- Categorization of speed by road type:
+  - Urban: < 50 km/h
+  - Suburban: 50–90 km/h
+  - Highway: > 90 km/h
+- Analytics screen with:
   - Max, Min, and Avg speed
   - Time spent in Urban, Suburban, and Highway zones
--  Saves ride results to SharedPreferences
--  Broadcast receiver updates UI live
--  `AnalyticsManager` handles all statistics
+  - Count of aggressive driving events
+- GPX file support with timestamps
+- Live broadcast updates for UI integration
+- Results saved using SharedPreferences
+- `AnalyticsManager` handles ride analytics and history
 
 ---
 
@@ -50,38 +56,27 @@
 
 ---
 
-##  Usage
+## Usage
 
 - Tap **Start Speed Tracking** to begin tracking your ride.
 - Tap **Stop Speed Tracking** to end tracking and view analytics.
 - The app:
   - Starts a foreground service
-  - Collects and broadcasts speed values
-  - Calculates and stores ride statistics
-  - Displays results in a separate screen
+  - Uses `FusedLocationProviderClient` for accurate location updates
+  - Registers accelerometer and gyroscope sensors
+  - Detects aggressive acceleration and sharp turns
+  - Broadcasts real-time speed updates
+  - Calculates and saves ride statistics for display and storage
 
 ---
- ranges as:
-  - Urban: < 50 km/h
-  - Suburban: 50–90 km/h
-  - Highway: > 90 km/h
-- Tracks:
-  - Total duration in each category
-  - Max / Min / Avg speed (real-time)
-  - JSON export for historical storage
----
-## screenshots
-![1000000064](https://github.com/user-attachments/assets/89efb542-d830-441b-a824-c1a4f433c8db)
-![1000000065](https://github.com/user-attachments/assets/c0d2e05b-a9ed-435e-8435-76bb9d7f25ba)
 
-
-https://github.com/user-attachments/assets/65cdcf2b-3384-44eb-85a4-064a4d6e58e3
-
+## Screenshots
 
 ---
+
 ## Permissions
 
-Make sure to handle runtime permission requests in `MainActivity` for:
+Make sure to request runtime permissions in `MainActivity` for:
 
 ```java
 Manifest.permission.ACCESS_FINE_LOCATION
@@ -89,11 +84,10 @@ Manifest.permission.ACCESS_FINE_LOCATION
 
 ---
 
-##  Requirements
+## Requirements
 
-- Android Studio 
+- Android Studio
 - Minimum SDK 26 (Android 8.0)
 - Target SDK 34 (Android 14)
 
 ---
-
