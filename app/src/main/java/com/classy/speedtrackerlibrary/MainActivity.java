@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
             i.putExtra("urban", analytics.getUrbanCount());
             i.putExtra("suburban", analytics.getSuburbanCount());
             i.putExtra("highway", analytics.getHighwayCount());
+            i.putExtra("aggressive",analytics.getAggressiveEvents());
             startActivity(i);
         });
 

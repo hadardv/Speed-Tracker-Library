@@ -20,6 +20,7 @@ public class AnalyticsManager {
     private int urbanCount = 0;
     private int suburbanCount = 0;
     private int highwayCount = 0;
+    private int aggressiveEvents = 0;
 
     public void addSpeed(float speed){
         speeds.add(speed);
@@ -38,6 +39,14 @@ public class AnalyticsManager {
 
     public float getMaxSpeed(){
         return speeds.isEmpty() ? 0 : Collections.max(speeds);
+    }
+
+    public void setAggressiveEvents(int count){
+        aggressiveEvents = count;
+    }
+
+    public int getAggressiveEvents(){
+        return aggressiveEvents;
     }
 
     public float getMinSpeed(){
@@ -85,6 +94,7 @@ public class AnalyticsManager {
             obj.put("urban", getUrbanCount() / 60);
             obj.put("suburban", getSuburbanCount() / 60);
             obj.put("highway", getHighwayCount() / 60);
+            obj.put("number of anomaly events", getAggressiveEvents());
         } catch (JSONException e) {
             e.printStackTrace();
         }

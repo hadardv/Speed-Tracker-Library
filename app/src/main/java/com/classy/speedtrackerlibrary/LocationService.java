@@ -4,8 +4,14 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.IBinder;
@@ -28,28 +34,122 @@ import com.google.android.gms.location.Priority;
 
 public class LocationService extends Service {
     private FusedLocationProviderClient locationClient;
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private Sensor gyroscope;
+    private final float GYRO_THRESHOLD = 2.5f; // sharp turn
+    private final float ACC_THRESHOLD = 15.0f; // sharp gaz/braking
+
+    private final SensorEventListener sensorEventListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            long now = System.currentTimeMillis();
+            if (now - lastAggressiveSensorEventTime < 5000) return; // only once every 2 sec
+
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                float x = event.values[0];
+                float y = event.values[1];
+                float z = event.values[2];
+
+                double acceleration = Math.sqrt(x * x + y * y + z * z) - SensorManager.GRAVITY_EARTH;
+                if (TEST_MODE) {
+                    acceleration = 20.0;
+                }
+
+                if (acceleration > 3.0) {
+                    Log.d("AggressiveDriving", "Fake aggressive acceleration: " + acceleration);
+                    aggressiveEventCount++;
+                    lastAggressiveSensorEventTime = now;
+                    analytics.setAggressiveEvents(aggressiveEventCount);
+                }
+            }
+
+            if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+                float angularSpeed = Math.abs(event.values[2]); // Z-axis turn
+                if (TEST_MODE) {
+                    angularSpeed = 3.0f;
+                }
+
+                if (angularSpeed > GYRO_THRESHOLD) {
+                    Log.d("AggressiveDriving", "Fake aggressive turn: " + angularSpeed);
+                    aggressiveEventCount++;
+                    lastAggressiveSensorEventTime = now;
+                    analytics.setAggressiveEvents(aggressiveEventCount);
+                }
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            // ignore
+        }
+    };
+
+
     private LocationCallback locationCallback;
     private final AnalyticsManager analytics = AnalyticsManager.getInstance();
+    private float lastSpeed = -1f;
+    private long lastSpeedTimestamp = 0;
+    private int aggressiveEventCount = 0;
+    private long lastAggressiveSensorEventTime = 0;
+
+    private final boolean TEST_MODE = true;
+    private Location lastLocation = null;
+
+
+
 
 
 
     @Override
     public void onCreate() {
-        Log.d("LocationService", "PID: " + android.os.Process.myPid());
         super.onCreate();
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        if(sensorManager != null){
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+
+            sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+            sensorManager.registerListener(sensorEventListener, gyroscope, SensorManager.SENSOR_DELAY_NORMAL);
+        }
         locationClient = LocationServices.getFusedLocationProviderClient(this);
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull LocationResult result) {
                 for (Location location : result.getLocations()) {
-                    // this two lines are for real speed calculation, i'm on testing mode so i randomize the speed.
-//                    float speedMps = location.getSpeed();
-//                    float speedKmh = speedMps * 3.6f;
-                    float speedKmh = new java.util.Random().nextInt(150); // simulate 0–120 km/h
+                    float speedKmh = 0f; // Default to 0
 
+                    if (lastLocation != null) {
+                        float distance = lastLocation.distanceTo(location); // meters
+                        long deltaTime = location.getTime() - lastLocation.getTime(); // ms
+
+                        if (deltaTime > 0) {
+                            float speedMps = (distance / deltaTime) * 1000f;
+                            speedKmh = speedMps * 3.6f;
+                        }
+                    }
+
+
+                    long currentTime = location.getTime();
+                    if (lastSpeed >= 0) {
+                        float deltaSpeed = Math.abs(speedKmh - lastSpeed);
+                        long deltaTime = currentTime - lastSpeedTimestamp;
+
+                        if (deltaTime < 2000 && deltaSpeed > 15) {
+                            aggressiveEventCount++;
+                            Log.d("AggressiveDriving", "Aggressive event detected! Total: " + aggressiveEventCount);
+                        }
+                    }
+
+                    lastSpeed = speedKmh;
+                    lastSpeedTimestamp = currentTime;
+                    lastLocation = location;
                     Log.d("SpeedTracker", "Speed: " + speedKmh + " km/h");
+
                     analytics.addSpeed(speedKmh);
                     analytics.categorizeSpeed(speedKmh);
+                    analytics.setAggressiveEvents(aggressiveEventCount);
+
                     Log.d("SpeedTracker", "Max: " + analytics.getMaxSpeed() +
                             ", Min: " + analytics.getMinSpeed() +
                             ", Avg: " + analytics.getAverageSpeed() +
@@ -62,10 +162,9 @@ public class LocationService extends Service {
                     intent.putExtra("speed", speedKmh);
                     sendBroadcast(intent);
                     Log.d("SpeedTracker", "Broadcast sent: ");
-
-                    sendBroadcast(intent);
                 }
             }
+
         };
     }
     @Override
@@ -113,6 +212,9 @@ public class LocationService extends Service {
     public void onDestroy() {
         super.onDestroy();
         locationClient.removeLocationUpdates(locationCallback);
+        if (sensorManager != null) {
+            sensorManager.unregisterListener(sensorEventListener);
+        }
         analytics.reset();
     }
 

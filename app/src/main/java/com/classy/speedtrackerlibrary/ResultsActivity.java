@@ -7,8 +7,10 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.w3c.dom.Text;
+
 public class ResultsActivity extends AppCompatActivity {
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,6 +22,7 @@ public class ResultsActivity extends AppCompatActivity {
         TextView urbanTimeText = findViewById(R.id.urbanTimeText);
         TextView suburbanTimeText = findViewById(R.id.suburbanTimeText);
         TextView highwayTimeText = findViewById(R.id.highwayTimeText);
+        TextView anomalyEventsText = findViewById(R.id.anomalyEvents);
 
         Intent intent = getIntent();
 
@@ -29,14 +32,19 @@ public class ResultsActivity extends AppCompatActivity {
         long urbanMin = getIntent().getIntExtra("urban", 0) / 60;
         long suburbanMin = getIntent().getIntExtra("suburban", 0) / 60;
         long highwayMin = getIntent().getIntExtra("highway", 0) / 60;
+        int aggressiveEvents = getIntent().getIntExtra("aggressive", 0);
 
-        maxSpeedText.setText("Max Speed: " + max + " km/h");
-        minSpeedText.setText("Min Speed: " + min + " km/h");
-        avgSpeedText.setText("Avg Speed: " + avg + " km/h");
+        maxSpeedText.setText(String.format("Max Speed: %.1f km/h", max));
+        minSpeedText.setText(String.format("Min Speed: %.1f km/h", min));
+        avgSpeedText.setText(String.format("Avg Speed: %.1f km/h", avg));
+
 
         urbanTimeText.setText("Urban Time: " +urbanMin+ " min");
         suburbanTimeText.setText("Suburban Time: " + suburbanMin + " min");
         highwayTimeText.setText("Highway Time: " + highwayMin + " min");
+
+        anomalyEventsText.setText("Aggressive Driving Events: " + aggressiveEvents);
+
 
     }
 }
