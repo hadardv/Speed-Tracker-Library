@@ -1,93 +1,94 @@
 # SpeedTrackerLibrary
 
-**SpeedTrackerLibrary** is an Android app that tracks real-time driving speed using GPS and motion sensors. It categorizes segments by road type (urban, suburban, highway) and provides ride analytics including max, min, and average speed, as well as aggressive driving events.
+**SpeedTrackerLibrary** is an Android library to monitor your ride in real time:
+
+-  **GPS speed tracking** (km/h) via `FusedLocationProviderClient`
+-  **Ride analytics**: max, min, avg speed; time spent in Urban/Suburban/Highway zones
+-  **Aggressive driving detection** using accelerometer & gyroscope
+-  **Live UI updates** with broadcasts
+-  **Persistence**: save each ride summary as JSON in `SharedPreferences`
+-  **Auto‑start** your tracking service when your device connects to a specific Bluetooth device (e.g. Toyota Touch)
 
 ---
 
 ## Features
 
-- Real-time speed tracking using GPS
-- Accelerometer and gyroscope-based aggressive driving detection
-- Categorization of speed by road type:
-  - Urban: < 50 km/h
-  - Suburban: 50–90 km/h
-  - Highway: > 90 km/h
-- Analytics screen with:
-  - Max, Min, and Avg speed
-  - Time spent in Urban, Suburban, and Highway zones
-  - Count of aggressive driving events
-- GPX file support with timestamps
-- Live broadcast updates for UI integration
-- Results saved using SharedPreferences
-- `AnalyticsManager` handles ride analytics and history
+1. **Real‑time speed updates**
+2. **Categorization**:
+   - Urban: < 50 km/h
+   - Suburban: 50–90 km/h
+   - Highway: > 90 km/h
+3. **Aggressive Events**:
+   - Sharp acceleration/braking
+   - Sharp turns
+4. **Bluetooth Auto‑Start**:
+   - Define a target device name (`"Toyota Touch"` by default)
+   - When connected, `LocationService` fires up automatically (requires proper permissions)
+5. **Broadcast API**:
+   - `com.classy.SPEED_UPDATE` broadcasts speed values
+   - UI listens and renders live speed
+6. **Persistence**:
+   - Each ride summary saved under `"ride_<timestamp>"` in `SharedPreferences`
 
 ---
 
 ## Installation
 
-1. Clone the repository or copy the code into your Android Studio project.
-2. Ensure the following permissions are declared in `AndroidManifest.xml`:
+1. **Add permissions** to your `AndroidManifest.xml`:
 
-```xml
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-<uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
-<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-```
+   ```xml
+   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+   <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+   <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+   ```
 
-3. Add the required service and activity declarations in your manifest:
+2. **Register components** in the `<application>` block:
 
-```xml
-<activity android:name=".MainActivity" android:exported="true">
-    <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.LAUNCHER" />
-    </intent-filter>
-</activity>
+   ```xml
+   <receiver
+     android:name=".BluetoothReceiver"
+     android:exported="true">
+     <intent-filter>
+       <action android:name="android.bluetooth.device.action.ACL_CONNECTED"/>
+     </intent-filter>
+   </receiver>
 
-<activity android:name=".ResultsActivity" />
+   <service
+     android:name=".LocationService"
+     android:foregroundServiceType="location"
+     android:exported="false" />
 
-<service
-    android:name=".LocationService"
-    android:foregroundServiceType="location"
-    android:exported="false" />
-```
+   <activity android:name=".MainActivity" android:exported="true">
+     <intent-filter>
+       <action android:name="android.intent.action.MAIN" />
+       <category android:name="android.intent.category.LAUNCHER" />
+     </intent-filter>
+   </activity>
+   ```
+
+3. **Implement or integrate**:
+
+   - **`BluetoothReceiver`**: watches for `ACTION_ACL_CONNECTED`, verifies the target device, checks location & FGS permissions, then starts `LocationService` in the foreground.
+
+4. **Runtime permissions** (in your `MainActivity`):
+
+   - `ACCESS_FINE_LOCATION`
+   - `FOREGROUND_SERVICE_LOCATION` (API 34+)
+   - `BLUETOOTH_CONNECT` (API 31+)
 
 ---
 
-## Usage
-
-- Tap **Start Speed Tracking** to begin tracking your ride.
-- Tap **Stop Speed Tracking** to end tracking and view analytics.
-- The app:
-  - Starts a foreground service
-  - Uses `FusedLocationProviderClient` for accurate location updates
-  - Registers accelerometer and gyroscope sensors
-  - Detects aggressive acceleration and sharp turns
-  - Broadcasts real-time speed updates
-  - Calculates and saves ride statistics for display and storage
+Tap **Start Speed Tracking** to begin manually, or simply connect to your specified Bluetooth device to kick off automatically.
 
 ---
-
 ## Screenshots
+https://github.com/user-attachments/assets/340b4700-b048-4bab-adf4-b0bcd98048f6
 
----
+- Here are the logs that detects the Bluetooth device and start automatically the service
+<img width="1882" height="323" alt="Screenshot 2025-07-10 141047" src="https://github.com/user-attachments/assets/db323fc8-122a-4170-bf5f-dd42c9c679ce" />
 
-## Permissions
+https://github.com/user-attachments/assets/c6517adf-2a1d-45a9-bc4f-d252d4bd58c3
 
-Make sure to request runtime permissions in `MainActivity` for:
 
-```java
-Manifest.permission.ACCESS_FINE_LOCATION
-```
 
----
 
-## Requirements
-
-- Android Studio
-- Minimum SDK 26 (Android 8.0)
-- Target SDK 34 (Android 14)
-
----
