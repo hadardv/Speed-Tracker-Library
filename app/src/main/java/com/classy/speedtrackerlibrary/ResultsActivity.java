@@ -7,7 +7,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.w3c.dom.Text;
 
 public class ResultsActivity extends AppCompatActivity {
     @SuppressLint({"SetTextI18n", "DefaultLocale"})

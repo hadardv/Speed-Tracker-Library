@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
@@ -44,7 +43,7 @@ public class LocationService extends Service {
         @Override
         public void onSensorChanged(SensorEvent event) {
             long now = System.currentTimeMillis();
-            if (now - lastAggressiveSensorEventTime < 5000) return; // only once every 2 sec
+            if (now - lastAggressiveSensorEventTime < 5000) return;
 
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 float x = event.values[0];
@@ -117,11 +116,11 @@ public class LocationService extends Service {
             @Override
             public void onLocationResult(@NonNull LocationResult result) {
                 for (Location location : result.getLocations()) {
-                    float speedKmh = 0f; // Default to 0
+                    float speedKmh = 0f;
 
                     if (lastLocation != null) {
-                        float distance = lastLocation.distanceTo(location); // meters
-                        long deltaTime = location.getTime() - lastLocation.getTime(); // ms
+                        float distance = lastLocation.distanceTo(location);
+                        long deltaTime = location.getTime() - lastLocation.getTime();
 
                         if (deltaTime > 0) {
                             float speedMps = (distance / deltaTime) * 1000f;
@@ -186,7 +185,7 @@ public class LocationService extends Service {
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return; // Permissions not granted, silently fail or log
+            return;
         }
 
         locationClient.requestLocationUpdates(request, locationCallback, Looper.getMainLooper());
