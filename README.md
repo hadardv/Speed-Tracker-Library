@@ -85,7 +85,9 @@ Tap **Start Speed Tracking** to begin manually, or simply connect to your specif
 - Here are the logs that detects the Bluetooth device and start automatically the service
 <img width="1882" height="323" alt="Screenshot 2025-07-10 141047" src="https://github.com/user-attachments/assets/db323fc8-122a-4170-bf5f-dd42c9c679ce" />
 
-https://github.com/user-attachments/assets/c6517adf-2a1d-45a9-bc4f-d252d4bd58c3
+https://github.com/user-attachments/assets/092b1c78-1728-4bae-b183-95495d5478fe
+
+
 
 
 
