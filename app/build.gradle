@@ -22,6 +22,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    buildFeatures {
+        viewBinding true
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -31,13 +34,15 @@ android {
 dependencies {
 
     implementation libs.appcompat
-    implementation libs.material
+    implementation libs.material.v190
     implementation libs.activity
     implementation libs.constraintlayout
     implementation libs.play.services.location
+    implementation libs.play.services.maps
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
     implementation libs.play.services.location.v2101
+
 
 }

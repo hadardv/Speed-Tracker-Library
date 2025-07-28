@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -23,11 +24,16 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int LOCATION_PERMISSION_CODE = 42;
 
     private TextView speedTextView;
+    private FloatingActionButton StartStopButton;
+    private MaterialButton btnAnalytics;
     private final AnalyticsManager analytics = AnalyticsManager.getInstance();
 
     private final BroadcastReceiver speedReceiver = new BroadcastReceiver() {
@@ -46,7 +52,9 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        speedTextView = findViewById(R.id.speedTextView);
+        speedTextView = findViewById(R.id.tvCurrentSpeed);
+        StartStopButton = findViewById(R.id.fabStartStop);
+        btnAnalytics = findViewById(R.id.btnAnalytics);
 
         if (!hasLocationPermissions()) {
             String[] perms;
@@ -62,10 +70,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        Button startButton = findViewById(R.id.startServiceButton);
-        Button stopButton = findViewById(R.id.stopServiceButton);
 
-        startButton.setOnClickListener(v -> {
+        StartStopButton.setOnClickListener(v -> {
             if (hasLocationPermissions()) {
                 startLocationService();
             } else {
@@ -75,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        stopButton.setOnClickListener(v -> {
+        btnAnalytics.setOnClickListener(v -> {
             stopService(new Intent(this, LocationService.class));
             SharedPreferences prefs = getSharedPreferences("rides", MODE_PRIVATE);
             String json = analytics.getSummaryAsJson();
@@ -95,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (v, insets) -> {
             Insets sys = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(sys.left, sys.top, sys.right, sys.bottom);
             return insets;
@@ -147,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
     private void startLocationService() {
         Intent svc = new Intent(this, LocationService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Toast.makeText(this, "Starting speed tracker…", Toast.LENGTH_SHORT).show();
             startForegroundService(svc);
         } else {
             startService(svc);

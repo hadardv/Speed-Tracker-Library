@@ -13,7 +13,7 @@ import androidx.core.app.ActivityCompat;
 
 public class BluetoothReceiver extends BroadcastReceiver {
     private static final String TAG    = "BluetoothReceiver";
-    private static final String TARGET = "Toyota Touch";
+    private static final String TARGET = "Hadar’s AirPods Pro";
 
     @Override
     public void onReceive(Context ctx, Intent intent) {
@@ -32,6 +32,7 @@ public class BluetoothReceiver extends BroadcastReceiver {
         }
 
         String name = device.getName();
+        Log.d(TAG, "device name" + name);
         if (!TARGET.equals(name)) {
             return;
         }

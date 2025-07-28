@@ -5,15 +5,34 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolylineOptions;
 
-public class ResultsActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class ResultsActivity extends AppCompatActivity implements OnMapReadyCallback {
+    private final List<LatLng> routePoints = new ArrayList<>();
+
+
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
+
+        SupportMapFragment mapFrag = (SupportMapFragment)
+                getSupportFragmentManager().findFragmentById(R.id.mapFragment);
+        assert mapFrag != null;
+        mapFrag.getMapAsync(this);
 
         TextView maxSpeedText = findViewById(R.id.maxSpeedText);
         TextView minSpeedText = findViewById(R.id.minSpeedText);
@@ -46,4 +65,13 @@ public class ResultsActivity extends AppCompatActivity {
 
 
     }
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        if (!routePoints.isEmpty()) {
+            googleMap.addPolyline(new PolylineOptions().addAll(routePoints).width(6f));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(routePoints.get(0), 14f));
+        }
+    }
+
+
 }

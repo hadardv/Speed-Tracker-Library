@@ -25,8 +25,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SpeedTrackerLibrary">
-
+        android:theme="@style/Theme.RoadSense"
+        >
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDULJ-z7VX1uoLJ-Ei8pzjXt3Oowt99xfc"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">
