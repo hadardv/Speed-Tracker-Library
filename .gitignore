@@ -58,6 +58,7 @@ test-output/
 speed_data/
 .gradle
 /local.properties
+/gradle.properties
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
