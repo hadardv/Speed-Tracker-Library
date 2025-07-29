@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -29,10 +30,17 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class LocationService extends Service {
     private FusedLocationProviderClient locationClient;
+    private final List<LatLng> routePoints = new ArrayList<>();
+
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private Sensor gyroscope;
@@ -161,6 +169,8 @@ public class LocationService extends Service {
                     intent.putExtra("speed", speedKmh);
                     sendBroadcast(intent);
                     Log.d("SpeedTracker", "Broadcast sent: ");
+                    routePoints.add(new LatLng(location.getLatitude(), location.getLongitude()));
+
                 }
             }
 
@@ -214,6 +224,12 @@ public class LocationService extends Service {
         if (sensorManager != null) {
             sensorManager.unregisterListener(sensorEventListener);
         }
+        String json = new Gson().toJson(routePoints);
+        SharedPreferences prefs = getSharedPreferences("rides", MODE_PRIVATE);
+        prefs.edit()
+                .putString("last_route", json)
+                .apply();
+
         analytics.reset();
     }
 
