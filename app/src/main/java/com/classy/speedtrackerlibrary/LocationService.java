@@ -41,6 +41,16 @@ public class LocationService extends Service {
     private FusedLocationProviderClient locationClient;
     private final List<LatLng> routePoints = new ArrayList<>();
 
+    private LocationCallback locationCallback;
+    private final AnalyticsManager analytics = AnalyticsManager.getInstance();
+    private float lastSpeed = -1f;
+    private long lastSpeedTimestamp = 0;
+    private int aggressiveEventCount = 0;
+    private long lastAggressiveSensorEventTime = 0;
+
+    private final boolean TEST_MODE = true;
+    private Location lastLocation = null;
+
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private Sensor gyroscope;
@@ -91,21 +101,6 @@ public class LocationService extends Service {
             // ignore
         }
     };
-
-
-    private LocationCallback locationCallback;
-    private final AnalyticsManager analytics = AnalyticsManager.getInstance();
-    private float lastSpeed = -1f;
-    private long lastSpeedTimestamp = 0;
-    private int aggressiveEventCount = 0;
-    private long lastAggressiveSensorEventTime = 0;
-
-    private final boolean TEST_MODE = true;
-    private Location lastLocation = null;
-
-
-
-
 
 
     @Override
