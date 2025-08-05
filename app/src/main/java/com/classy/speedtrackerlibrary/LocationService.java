@@ -63,7 +63,7 @@ public class LocationService extends Service {
                     acceleration = 20.0;
                 }
 
-                if (acceleration > 3.0) {
+                if (acceleration > ACC_THRESHOLD) {
                     Log.d("AggressiveDriving", "Fake aggressive acceleration: " + acceleration);
                     aggressiveEventCount++;
                     lastAggressiveSensorEventTime = now;
